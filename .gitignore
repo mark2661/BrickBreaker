@@ -1,0 +1,15 @@
+# ignore all .swp files
+*.swp
+
+# ignore all .txt files
+*.txt
+
+# ignore vs code folder
+.vscode
+
+# ignore vim temp files
+*.swm
+*.swn
+*.swo
+
+
