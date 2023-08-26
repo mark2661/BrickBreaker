@@ -97,6 +97,7 @@ int main()
     sf::Vector2f velocity = sf::Vector2f(5.0f, 3.0f);
 
 
+    bool pause = false;
     // game loop
     while (window.isOpen())
     {
@@ -107,49 +108,58 @@ int main()
             {
                 window.close();
             }
-       }
 
-        // user input (update bat position)
-        bat.setPosition(sf::Mouse::getPosition(window).x - bat.getSize().x/2, bat.getPosition().y);
-        clampHorizontal(bat);
-
-        // ball logic
-        ball.move(componentWiseVectorMultiplication(direction, velocity));
-
-        // collison detection
-        if ((ball.getPosition().x + (2*radius)) >= WINDOW_WIDTH or (ball.getPosition().x <= 0))
-        {
-            velocity.x *= -1;
-        }
-        if ((ball.getPosition().y + (2*radius)) >= WINDOW_HEIGHT or (ball.getPosition().y <= 0))
-        {
-            velocity.y *= -1;
-        }
-
-        if (intersects(ball, bat))
-        {
-            velocity.y *= -1;
-            // incase of side on collisons set ball height slightly above top surface of bat.
-            ball.setPosition(ball.getPosition().x, bat.getPosition().y - bat.getSize().y - BALL_RESET_OFFSET);
-        }
-
-        window.clear();
-        window.draw(bat);
-        for(auto& bar : bars)
-        {
-            // if bar is active
-            if (std::get<1>(bar))
+            if (event.type == sf::Event::KeyPressed and event.key.code == sf::Keyboard::P)
             {
-                if (intersects(ball, std::get<0>(bar)))
-                {
-                    std::get<1>(bar) = false;
-                    velocity.y *= -1;
-                }
-                window.draw(std::get<0>(bar));
+                pause = !pause;
             }
        }
-        window.draw(ball);
-        window.display();
+
+       if (!pause)
+       {
+            // user input (update bat position)
+            bat.setPosition(sf::Mouse::getPosition(window).x - bat.getSize().x / 2, bat.getPosition().y);
+            clampHorizontal(bat);
+
+            // ball logic
+            ball.move(componentWiseVectorMultiplication(direction, velocity));
+
+            // collison detection
+            if ((ball.getPosition().x + (2 * radius)) >= WINDOW_WIDTH or (ball.getPosition().x <= 0))
+            {
+                velocity.x *= -1;
+            }
+            if ((ball.getPosition().y + (2 * radius)) >= WINDOW_HEIGHT or (ball.getPosition().y <= 0))
+            {
+                velocity.y *= -1;
+            }
+
+            if (intersects(ball, bat))
+            {
+                velocity.y *= -1;
+                // incase of side on collisons set ball height slightly above top surface of bat.
+                ball.setPosition(ball.getPosition().x, bat.getPosition().y - bat.getSize().y - BALL_RESET_OFFSET);
+            }
+
+            window.clear();
+            window.draw(bat);
+            for (auto &bar : bars)
+            {
+                // if bar is active
+                if (std::get<1>(bar))
+                {
+                    if (intersects(ball, std::get<0>(bar)))
+                    {
+                        std::get<1>(bar) = false;
+                        velocity.y *= -1;
+                    }
+                    window.draw(std::get<0>(bar));
+                }
+            }
+            window.draw(ball);
+       }
+
+       window.display();
     }
 
     return 0;
